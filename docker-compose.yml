@@ -1,0 +1,9 @@
+services:
+  app:
+    container_name: tdd_shop
+    build:
+      dockerfile: ./Dockerfile
+    command:
+      - "python"
+      - "main.py"
+    restart: always
