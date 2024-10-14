@@ -121,7 +121,8 @@ async def confirm_handler(message: types.Message, state: FSMContext) -> None:
     )
     await message.bot.send_sticker(
         chat_id=message.chat.id,
-        sticker=time_sticker,
+        sticker="CAACAgIAAxkBAAEM9x1nDRaGogtRzn"
+        "2Pqc3Zsdq6wnavMQACSAIAAladvQoc9XL43CkU0DYE",
     )
     data = await state.get_data()
     for admin in settings.admin_ids:
