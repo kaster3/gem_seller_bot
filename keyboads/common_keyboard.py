@@ -4,51 +4,52 @@ from aiogram.utils.keyboard import (
     ReplyKeyboardMarkup,
 )
 
+cancel_text = "🚫 Отмена 🚫"
+main_menu = "↪️Главное меню ↩️"
+
 
 def get_keyboard() -> ReplyKeyboardMarkup:
     names = (
-        "1000 гемов(0.035р за шт) - 35р",
-        "5000 гемов(0.033р за шт) - 165р",
-        "10000 гемов(0.03р за шт) - 300р",
-        "25000 гемов(0.027р за шт) - 675р",
-        "📥 Связаться с поддержкой 📥",
+        "💎 1000 гемов(0.035р за шт) - 35р 💎",
+        "💎 5000 гемов(0.033р за шт) - 150р 💎",
+        "💎 10000 гемов(0.03р за шт) - 270р 💎",
+        "💎 25000 гемов(0.027р за шт) - 625р 💎",
+        "💎 50000 гемов(0.025р за шт) - 1250р 💎",
+        "💎 100000 гемов(0.020р за шт) - 2000р 💎",
     )
-
-    last_button = [KeyboardButton(text=names[-1])]
 
     builder = ReplyKeyboardBuilder()
 
-    for name in names[:-1]:
+    for name in names:
         builder.button(text=name)
 
     builder.adjust(2)
-    builder.row(last_button[0])
 
     return builder.as_markup(resize_keyboard=True)
 
 
-def get_support_button() -> ReplyKeyboardMarkup:
-    support_button = [KeyboardButton(text="📥 Связаться с поддержкой 📥")]
-    cancel_button = [KeyboardButton(text="🚫 Отмена 🚫")]
-    return ReplyKeyboardMarkup(
-        keyboard=[support_button, cancel_button],
-        resize_keyboard=True,
-    )
-
-
-def get_confirm_button() -> ReplyKeyboardMarkup:
-    confirm_button = [KeyboardButton(text="😎 Оплатил! 😎")]
-    support_button = [KeyboardButton(text="📥 Связаться с поддержкой 📥")]
-    cancel_button = [KeyboardButton(text="🚫 Отмена 🚫")]
-    return ReplyKeyboardMarkup(
-        keyboard=[confirm_button, support_button, cancel_button],
-        resize_keyboard=True,
-    )
+def get_confirm_button(cancel_txt: str) -> ReplyKeyboardMarkup:
+    confirm_text = "😎 Оплатил! 😎"
+    builder = ReplyKeyboardBuilder()
+    builder.button(text=confirm_text)
+    builder.button(text=cancel_txt)
+    builder.adjust(1)
+    return builder.as_markup(resize_keyboard=True)
 
 
 def get_start_keyboard() -> ReplyKeyboardMarkup:
     gem_button = [KeyboardButton(text="💎 Покупка гемов 💎")]
+    support_button = [KeyboardButton(text="📥 Связаться с поддержкой 📥")]
     return ReplyKeyboardMarkup(
-        keyboard=[gem_button],
+        keyboard=[
+            gem_button,
+            support_button,
+        ],
         resize_keyboard=True,
     )
+
+
+def get_cancel_button(cancel_txt: str) -> ReplyKeyboardMarkup:
+    builder = ReplyKeyboardBuilder()
+    builder.button(text=cancel_txt)
+    return builder.as_markup(resize_keyboard=True)
