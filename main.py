@@ -8,7 +8,7 @@ from settings import settings
 
 
 async def main():
-    bot = Bot(token=settings.token)
+    bot = Bot(token=settings.token.get_secret_value())
 
     dp = Dispatcher()
     dp.include_router(main_router)
