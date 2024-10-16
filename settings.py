@@ -1,3 +1,4 @@
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -8,11 +9,11 @@ class BotSettings(BaseSettings):
         env_nested_delimiter="__",
         env_prefix="BOT__",
     )
-    token: str
+    token: SecretStr
     admin_ids: frozenset[int] = frozenset(
         {
             850328937,  # @jase_go
-            815114488,  # @greitt
+            # 815114488,  # @greitt
         }
     )
 
