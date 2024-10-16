@@ -2,13 +2,12 @@ import asyncio
 
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
-from aiogram.types import ReplyKeyboardRemove
 
 from keyboads import (
+    get_cancel_button,
     get_confirm_button,
     get_keyboard,
     get_start_keyboard,
-    get_support_button,
 )
 from settings import settings
 from utils import calculate_summ, find_quantity
@@ -16,6 +15,8 @@ from utils import calculate_summ, find_quantity
 from .states import Support, Survey
 
 router = Router(name=__name__)
+
+cancel_text = "🚫 Отмена 🚫"
 
 
 @router.message(F.text == "💎 Покупка гемов 💎")
@@ -31,7 +32,7 @@ async def start_handler(message: types.Message, state: FSMContext) -> None:
 async def support_handler(message: types.Message, state: FSMContext) -> None:
     await message.answer(
         text="📝 Напиши свое сообщение админу и он сразу тебе ответит, как освободится 📝",
-        reply_markup=ReplyKeyboardRemove(),
+        reply_markup=get_cancel_button(cancel_text),
     )
     await state.set_state(Support.report)
 
@@ -49,19 +50,25 @@ async def report_handler(message: types.Message, state: FSMContext) -> None:
             from_chat_id=message.chat.id,
             message_id=message.message_id,
         )
-    await message.answer(text="📩 Я успешно переслал твое сообщение Админу! 📩")
+        await message.bot.send_message(
+            chat_id=admin,
+            text=f"{message.chat.id}",
+        )
+
+    await message.answer(
+        text="📩 Я успешно переслал твое сообщение Админу! 📩",
+        reply_markup=get_start_keyboard(),
+    )
     await state.clear()
 
 
-@router.message(F.text.contains("1000 гемов"))
-@router.message(F.text.contains("5000 гемов"))
+@router.message(F.text.contains("1000 гемов") | F.text.contains("5000 гемов"))
 @router.message(F.text.contains("10000 гемов"))
 @router.message(F.text.contains("25000 гемов"))
 @router.message(F.text.contains("50000 гемов"))
 @router.message(F.text.contains("100000 гемов"))
 @router.message(F.text.isdigit(), Survey.quantity)
 async def quantity_handler(message: types.Message, state: FSMContext) -> None:
-    print(message.text)
     quantity: int = 0
     if isinstance(message.text, str):
         quantity = find_quantity(message.text)
@@ -76,10 +83,10 @@ async def quantity_handler(message: types.Message, state: FSMContext) -> None:
         await message.answer(
             text="Теперь введи свой ник в TDD,"
             " будь внимательнее, туда в Post Office придут гемы",
-            reply_markup=get_support_button(),
+            reply_markup=get_cancel_button(cancel_text),
         )
     elif quantity < 1000:
-        await message.answer(text="Минимальное число гемов для покупки - 1000")
+        await message.answer(text="⚠️ Минимальное число гемов для покупки - 1000 ⚠️")
 
 
 @router.message(Survey.quantity)
@@ -100,7 +107,7 @@ async def nickname_handler(message: types.Message, state: FSMContext) -> None:
     )
     await message.answer(
         text="Как оплатишь покупку нажми кнопку '😎 Оплатил! 😎'",
-        reply_markup=get_confirm_button(),
+        reply_markup=get_confirm_button(cancel_text),
     )
     await state.set_state(Survey.confirm)
 
@@ -109,7 +116,7 @@ async def nickname_handler(message: types.Message, state: FSMContext) -> None:
 async def invalid_nickname_handler(message: types.Message) -> None:
     await message.answer(
         text="❗️❗️❗️ Введи свой ник из TDD, туда на Post Office придут гемы ❗️❗️❗️",
-        reply_markup=get_support_button(),
+        reply_markup=get_cancel_button(cancel_text),
     )
 
 
@@ -121,17 +128,34 @@ async def confirm_handler(message: types.Message, state: FSMContext) -> None:
     )
     await message.bot.send_sticker(
         chat_id=message.chat.id,
-        sticker="CAACAgIAAxkBAAEM9x1nDRaGogtRzn"
-        "2Pqc3Zsdq6wnavMQACSAIAAladvQoc9XL43CkU0DYE",
+        sticker="CAACAgIAAxkBAAEM9x1nDRaGogtRzn2Pqc3"
+        "Zsdq6wnavMQACSAIAAladvQoc9XL43CkU0DYE",
     )
     data = await state.get_data()
     for admin in settings.admin_ids:
         await message.bot.send_message(
             chat_id=admin,
             text=f"Nickname TDD: {data['nickname']}\n"
-            f"Nickname TG: {message.from_user.full_name}\n"
+            f"Nickname TG: {message.from_user.username}\n"
             f"User ID: {message.from_user.id}\n"
             f"Количество: {data['quantity']}\n"
             f"К оплате: {data['price']}",
         )
     await state.clear()
+
+
+@router.message(F.reply_to_message & F.from_user.id.in_(settings.admin_ids))
+async def unknown_handler(message: types.Message) -> None:
+    for m in message:
+        print(m)
+    await message.bot.forward_message(
+        chat_id=815114488,
+        from_chat_id=message.chat.id,
+        message_id=message.message_id,
+    )
+
+
+@router.message(F.bot.forward_message)
+async def forward_handler(message: types.Message) -> None:
+    for m in message:
+        print(m)
