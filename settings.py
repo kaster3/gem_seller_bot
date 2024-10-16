@@ -14,7 +14,7 @@ class BotSettings(BaseSettings):
         {
             850328937,  # @jase_go
             7765313456,  # @helperTTDstore
-            # 815114488,  # @greitt
+            815114488,  # @greitt
         }
     )
 
