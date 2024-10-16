@@ -7,3 +7,5 @@ services:
       - "python"
       - "main.py"
     restart: always
+    env_file:
+      - ".env"
