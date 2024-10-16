@@ -13,6 +13,7 @@ class BotSettings(BaseSettings):
     admin_ids: frozenset[int] = frozenset(
         {
             850328937,  # @jase_go
+            7765313456,  # @helperTTDstore
             # 815114488,  # @greitt
         }
     )
