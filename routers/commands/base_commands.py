@@ -3,6 +3,7 @@ from aiogram.filters import Command, CommandStart
 from aiogram.fsm.context import FSMContext
 
 from keyboads import get_start_keyboard
+from settings import settings
 
 router = Router(name=__name__)
 
@@ -15,6 +16,11 @@ async def start_handler(message: types.Message, state: FSMContext) -> None:
     )
     if state:
         await state.clear()
+    for admin in settings.admin_ids:
+        await message.bot.send_message(
+            chat_id=admin,
+            text=f"{message.from_user.username} начал использовать бота.",
+        )
 
 
 @router.message(Command("help"))
