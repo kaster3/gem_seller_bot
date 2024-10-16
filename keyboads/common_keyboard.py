@@ -4,9 +4,6 @@ from aiogram.utils.keyboard import (
     ReplyKeyboardMarkup,
 )
 
-cancel_text = "🚫 Отмена 🚫"
-main_menu = "↪️Главное меню ↩️"
-
 
 def get_keyboard() -> ReplyKeyboardMarkup:
     names = (
@@ -52,4 +49,10 @@ def get_start_keyboard() -> ReplyKeyboardMarkup:
 def get_cancel_button(cancel_txt: str) -> ReplyKeyboardMarkup:
     builder = ReplyKeyboardBuilder()
     builder.button(text=cancel_txt)
+    return builder.as_markup(resize_keyboard=True)
+
+
+def get_menu_button(main_txt: str) -> ReplyKeyboardMarkup:
+    builder = ReplyKeyboardBuilder()
+    builder.button(text=main_txt)
     return builder.as_markup(resize_keyboard=True)
