@@ -7,16 +7,18 @@ from keyboads import (
     get_cancel_button,
     get_confirm_button,
     get_keyboard,
+    get_menu_button,
     get_start_keyboard,
 )
 from settings import settings
 from utils import calculate_summ, find_quantity
 
-from .states import Support, Survey
+from .states import Survey
 
 router = Router(name=__name__)
 
 cancel_text = "🚫 Отмена 🚫"
+main_menu = "↪️Главное меню ↩️"
 
 
 @router.message(F.text == "💎 Покупка гемов 💎")
@@ -29,37 +31,37 @@ async def start_handler(message: types.Message, state: FSMContext) -> None:
 
 
 @router.message(F.text == "📥 Связаться с поддержкой 📥")
-async def support_handler(message: types.Message, state: FSMContext) -> None:
+async def support_handler(message: types.Message) -> None:
     await message.answer(
-        text="📝 Напиши свое сообщение админу и он сразу тебе ответит, как освободится 📝",
-        reply_markup=get_cancel_button(cancel_text),
+        text="😎 Кликни на ссылку, чтобы написать админу: 👉 @helperTTDstore",
+        reply_markup=get_menu_button(main_txt=main_menu),
     )
-    await state.set_state(Support.report)
+    # await state.set_state(Support.report)
 
 
-@router.message(Support.report)
-async def report_handler(message: types.Message, state: FSMContext) -> None:
-    await message.bot.send_sticker(
-        chat_id=message.chat.id,
-        sticker="CAACAgIAAxkBAAEM9x1nDRaGogtRz"
-        "n2Pqc3Zsdq6wnavMQACSAIAAladvQoc9XL43CkU0DYE",
-    )
-    for admin in settings.admin_ids:
-        await message.bot.forward_message(
-            chat_id=admin,
-            from_chat_id=message.chat.id,
-            message_id=message.message_id,
-        )
-        await message.bot.send_message(
-            chat_id=admin,
-            text=f"{message.chat.id}",
-        )
-
-    await message.answer(
-        text="📩 Я успешно переслал твое сообщение Админу! 📩",
-        reply_markup=get_start_keyboard(),
-    )
-    await state.clear()
+# @router.message(Support.report)
+# async def report_handler(message: types.Message, state: FSMContext) -> None:
+#     await message.bot.send_sticker(
+#         chat_id=message.chat.id,
+#         sticker="CAACAgIAAxkBAAEM9x1nDRaGogtRz"
+#         "n2Pqc3Zsdq6wnavMQACSAIAAladvQoc9XL43CkU0DYE",
+#     )
+#     for admin in settings.admin_ids:
+#         await message.bot.forward_message(
+#             chat_id=admin,
+#             from_chat_id=message.chat.id,
+#             message_id=message.message_id,
+#         )
+#         await message.bot.send_message(
+#             chat_id=admin,
+#             text=f"{message.chat.id}",
+#         )
+#
+#     await message.answer(
+#         text="📩 Я успешно переслал твое сообщение Админу! 📩",
+#         reply_markup=get_start_keyboard(),
+#     )
+#     await state.clear()
 
 
 @router.message(F.text.contains("1000 гемов") | F.text.contains("5000 гемов"))
@@ -81,7 +83,7 @@ async def quantity_handler(message: types.Message, state: FSMContext) -> None:
         )
         await asyncio.sleep(0.3)
         await message.answer(
-            text="Теперь введи свой ник в TDD,"
+            text="Теперь введи свой ник в Roblox,"
             " будь внимательнее, туда в Post Office придут гемы",
             reply_markup=get_cancel_button(cancel_text),
         )
@@ -102,7 +104,7 @@ async def nickname_handler(message: types.Message, state: FSMContext) -> None:
     data = await state.get_data()
     await message.answer(
         text=f"Осталось только заплатить!\n\n"
-        f"💳 Сбербанк: 234234234 💳"
+        f"💳 Сбербанк: 2202208304452486 💳"
         f"\n💰{data['price']} рублей.💰"
     )
     await message.answer(
@@ -115,7 +117,7 @@ async def nickname_handler(message: types.Message, state: FSMContext) -> None:
 @router.message(~F.text, Survey.nickname)
 async def invalid_nickname_handler(message: types.Message) -> None:
     await message.answer(
-        text="❗️❗️❗️ Введи свой ник из TDD, туда на Post Office придут гемы ❗️❗️❗️",
+        text="❗️❗️❗️ Введи свой ник из Roblox, туда на Post Office придут гемы ❗️❗️❗️",
         reply_markup=get_cancel_button(cancel_text),
     )
 
@@ -123,7 +125,8 @@ async def invalid_nickname_handler(message: types.Message) -> None:
 @router.message(F.text == "😎 Оплатил! 😎", Survey.confirm)
 async def confirm_handler(message: types.Message, state: FSMContext) -> None:
     await message.answer(
-        text="🎉Спасибо за покупку!🎉\nТовар придет в течение 5 минут, с 08:00 до 23:00",
+        text="🎉 Спасибо за покупку! 🎉\n"
+        "⏳ Товар придет в течение 5 минут, с 08:00 до 23:00 ⏳",
         reply_markup=get_start_keyboard(),
     )
     await message.bot.send_sticker(
@@ -153,9 +156,3 @@ async def unknown_handler(message: types.Message) -> None:
         from_chat_id=message.chat.id,
         message_id=message.message_id,
     )
-
-
-@router.message(F.bot.forward_message)
-async def forward_handler(message: types.Message) -> None:
-    for m in message:
-        print(m)
