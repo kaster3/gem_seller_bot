@@ -8,11 +8,13 @@ router = Router(name=__name__)
 
 
 @router.message(CommandStart())
-async def start_handler(message: types.Message) -> None:
+async def start_handler(message: types.Message, state: FSMContext) -> None:
     await message.answer(
         text=f"Привет, {message.from_user.first_name}! 👋",
         reply_markup=get_start_keyboard(),
     )
+    if state:
+        await state.clear()
 
 
 @router.message(Command("help"))
@@ -22,7 +24,7 @@ async def help_handler(message: types.Message) -> None:
     )
 
 
-@router.message(F.text == "🚫 Отмена 🚫")
+@router.message((F.text == "🚫 Отмена 🚫") | (F.text == "↪️Главное меню ↩️"))
 async def cancel_handler(message: types.Message, state: FSMContext) -> None:
     await message.answer(
         text="Ты снова в главном меню!",
